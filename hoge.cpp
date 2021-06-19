@@ -1,26 +1,22 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
 using namespace std;
-
-long long my_pow(long long a, long long b, long long E){
-    long long ans = 1;
-    while(b){
-        if (b%2==1) ans = ans*a%E;
-        a = a*a%E;
-        b /= 2; 
-    }
-    return ans;
-}
 int main(){
-    long long N,K;
-    cin >> N >> K;
-    long long E = 1e9+7;
-    if (N==1){
-        cout << K << endl;
-        return 0;
-    }else if (K==1){
-        cout << 0 << endl;
-        return 0;
+    int N;
+    cin >> N;
+    vector<int> X(N);
+    vector<int> Y(N);
+    for (int i=0; i<N; i++) cin >> X.at(i) >> Y.at(i);
+    sort(X.begin(), X.end());
+    sort(Y.begin(), Y.end());
+    /*発電所の場所*/
+    int x = X.at(N/2);
+    int y = Y.at(N/2);
+    long long ans = 0;
+    for (int i=0; i<N; i++){
+        ans += abs(X.at(i)-x);
+        ans += abs(Y.at(i)-y);
     }
-    long long ans = K*(K-1)%E;
-    cout << ans*my_pow(K-2, N-2, E)%E << endl;
+    cout << ans << endl;
 }
