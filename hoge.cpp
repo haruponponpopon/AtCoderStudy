@@ -1,30 +1,26 @@
 #include <iostream>
-#include <string>
-#include <algorithm>
 using namespace std;
-int main(){
-    string N;
-    int K;
-    cin >> N >> K;
-    for (int i=0; i<K; i++){
-        /*十進法に直す*/
-        long long t_N=0;
-        for (int j=0; j<(int)N.size(); j++){
-            t_N = t_N*8+int(N[j]-'0');
-        }
-        N = "";
-        if (t_N==0) {
-            cout << 0 << endl;
-            return 0;
-        }
-        /*9進法に直す*/
-        while(t_N){
-            long long next_digit = t_N%9;
-            if (next_digit==8) N+='5';
-            else N+=next_digit+'0';
-            t_N /= 9;
-        }
-        reverse(N.begin(), N.end());
+
+long long my_pow(long long a, long long b, long long E){
+    long long ans = 1;
+    while(b){
+        if (b%2==1) ans = ans*a%E;
+        a = a*a%E;
+        b /= 2; 
     }
-    cout << N << endl;
+    return ans;
+}
+int main(){
+    long long N,K;
+    cin >> N >> K;
+    long long E = 1e9+7;
+    if (N==1){
+        cout << K << endl;
+        return 0;
+    }else if (K==1){
+        cout << 0 << endl;
+        return 0;
+    }
+    long long ans = K*(K-1)%E;
+    cout << ans*my_pow(K-2, N-2, E)%E << endl;
 }
