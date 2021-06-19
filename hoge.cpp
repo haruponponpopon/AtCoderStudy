@@ -1,26 +1,12 @@
 #include <iostream>
-#include <vector>
+#include <complex>
 using namespace std;
 int main(){
-    int N;
-    cin >> N;
-    vector<int> A(N);
-    for (int i=0; i<N; i++) cin >> A.at(i);
-    /*bit全探索*/
-    int ans = -1;
-    for (int i=0; i<(1<<(N-1)); i++){
-        int xored = 0;
-        int ored = 0;
-        for (int j=0; j<N-1; j++){
-            ored |= A.at(j);
-            if (1&(i>>j)){
-                xored ^= ored;
-                ored = 0;
-            }
-        }
-        ored |= A.at(N-1);
-        xored ^= ored;
-        if (ans==-1||xored<ans) ans = xored;
-    }
-    cout << ans << endl;
+    double N,x0,y0,xn2,yn2;
+    cin>>N>>x0>>y0>>xn2>>yn2;
+    complex<double> a(x0,y0);
+    complex<double> b(xn2,yn2);
+    complex<double> c = (a+b)/2.0;
+    complex<double> ans = c + (a-c)*polar(1.0, M_PI*2/N);
+    cout << ans.real() << " " << ans.imag() << endl;
 }
