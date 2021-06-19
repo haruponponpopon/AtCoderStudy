@@ -1,22 +1,26 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
 using namespace std;
 int main(){
     int N;
     cin >> N;
-    vector<int> X(N);
-    vector<int> Y(N);
-    for (int i=0; i<N; i++) cin >> X.at(i) >> Y.at(i);
-    sort(X.begin(), X.end());
-    sort(Y.begin(), Y.end());
-    /*発電所の場所*/
-    int x = X.at(N/2);
-    int y = Y.at(N/2);
-    long long ans = 0;
-    for (int i=0; i<N; i++){
-        ans += abs(X.at(i)-x);
-        ans += abs(Y.at(i)-y);
+    vector<int> A(N);
+    for (int i=0; i<N; i++) cin >> A.at(i);
+    /*bit全探索*/
+    int ans = -1;
+    for (int i=0; i<(1<<(N-1)); i++){
+        int xored = 0;
+        int ored = 0;
+        for (int j=0; j<N-1; j++){
+            ored |= A.at(j);
+            if (1&(i>>j)){
+                xored ^= ored;
+                ored = 0;
+            }
+        }
+        ored |= A.at(N-1);
+        xored ^= ored;
+        if (ans==-1||xored<ans) ans = xored;
     }
     cout << ans << endl;
 }
