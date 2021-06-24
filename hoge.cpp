@@ -1,12 +1,32 @@
 #include <iostream>
-#include <complex>
+#include <vector>
+#include <algorithm>
 using namespace std;
 int main(){
-    double N,x0,y0,xn2,yn2;
-    cin>>N>>x0>>y0>>xn2>>yn2;
-    complex<double> a(x0,y0);
-    complex<double> b(xn2,yn2);
-    complex<double> c = (a+b)/2.0;
-    complex<double> ans = c + (a-c)*polar(1.0, M_PI*2/N);
-    cout << ans.real() << " " << ans.imag() << endl;
+    int N,M,Q,L,R;
+    cin>>N>>M>>Q;
+    vector<vector<int>>bag(N,vector<int>(2));
+    vector<int>box(M);
+    for (int i=0; i<N; i++) cin>>bag.at(i).at(0)>>bag.at(i).at(1);
+    sort(bag.rbegin(),bag.rend(),[](const vector<int> &x,const vector<int> &y){return x[1] < y[1];});
+    for (int i=0; i<M; i++) cin>>box.at(i);
+    for (int i=0; i<Q; i++){
+        cin>>L>>R;
+        vector<int>box1;
+        for (int j=0; j<L-1; j++) box1.push_back(box.at(j));
+        for (int j=R; j<M; j++) box1.push_back(box.at(j));
+        sort(box1.begin(),box1.end());
+        int ans = 0;
+        vector<int>used((int)box1.size());
+        for (int j=0; j<N; j++){ //jは荷物
+            for (int k=0; k<(int)box1.size(); k++){ //kは箱
+                if (!used.at(k)&&box1.at(k)>=bag.at(j).at(0)){
+                    used.at(k) = 1;
+                    ans += bag.at(j).at(1);
+                    break;
+                }
+            }
+        }
+        cout << ans << endl;
+    }
 }
