@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <numeric>
 using namespace std;
 class UnionFind {
 public:
@@ -30,30 +31,19 @@ public:
 
 int main(){
     UnionFind UF;
-    int H,W,Q,q,r,c,ra,ca,rb,cb;
-    cin>>H>>W>>Q;
-    UF.init(H*W);
-    vector<int> x = {0,0,1,-1};
-    vector<int> y = {1,-1,0,0};
-    vector<vector<int>> color(H, vector<int>(W)); //while is 0
-    for (int i=0; i<Q; i++){
-        cin >> q;
-        if (q==1){ //paint red (r,c)
-            cin>>r>>c;r--;c--;
-            color.at(r).at(c) = 1;
-            for (int j=0; j<4; j++){
-                int nr = r+x.at(j);
-                int nc = c+y.at(j);
-                if (nr<H&&nr>=0&&nc<W&&nc>=0&&color.at(nr).at(nc)){
-                    UF.unite(r*W+c, nr*W+nc);
-                    // cout << r*W+c << " " << nr*W+nc << endl;
-                }
-            }
-        }else{
-            cin>>ra>>ca>>rb>>cb;
-            ra--;ca--;rb--;cb--;
-            if (color.at(ra).at(ca) && UF.same(ra*W+ca, rb*W+cb)) cout << "Yes" << endl;
-            else cout << "No" << endl;
+    int N;
+    cin>>N;
+    vector<int> A(N);
+    for (int i=0;i<N;i++) cin>>A.at(i);
+    UF.init(200001);
+    int ans = 0;
+    for (int i=0; i<N/2; i++){
+        if (A.at(i)==A.at(N-i-1))continue;
+        else if (UF.same(A.at(i), A.at(N-i-1))) continue;
+        else{
+            ans++;
+            UF.unite(A.at(i), A.at(N-i-1));
         }
     }
+    cout << ans << endl;
 }
