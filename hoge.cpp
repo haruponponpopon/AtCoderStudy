@@ -1,23 +1,44 @@
 #include <iostream>
-#include <cmath>
+#include <vector>
 using namespace std;
 
 int main(){
-    long long N;
+    int N;
+    long long total = 0;
     cin >> N;
-    int count = 0;
-    for (int i=2; i<=sqrt(N); i++){
-        while (N%i==0){
-            count++;
-            N /= i;
+    vector<long long> A(N);
+    for (int i=0; i<N; i++){
+        cin >> A.at(i);
+        total += A.at(i);
+    }
+    if (total%10){
+        cout << "No" << endl;
+        return 0;
+    }
+    long long piece = total/10;
+
+    int index1 = 0;
+    int index2 = 0;
+    long long cake = A.at(0);
+    while (index1<N){
+        // cout << index1 << " " << index2 << " " << cake << endl;
+        if (cake==piece){
+            cout << "Yes" << endl;
+            return 0;
+        }else if (cake>piece) {
+            cake -= A.at(index1);
+            if (index1!=index2) index1++;
+            else {
+                if (index2==N-1) index2 = -1;
+                index1++;
+                index2++;
+                if (index1<N) cake += A.at(index1);
+            }
+        }else{
+            if (index2==N-1) index2 = -1;
+            index2++;
+            cake += A.at(index2);
         }
     }
-    if (N!=1) count++;
-    int ans = 0;
-    int two = 1;
-    while (two<count){
-        two *= 2;
-        ans++;
-    }
-    cout << ans << endl;
+    cout << "No" << endl;
 }
