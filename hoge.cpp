@@ -1,28 +1,64 @@
-#include <vector>
 #include <iostream>
+#include <vector>
+#include <climits>
 using namespace std;
+
 int main(){
-	int N,M,K,U,V;
-	long long E = 998244353;
-	cin>>N>>M>>K;
-	vector<vector<int>> node(N+1);
-	for (int i=0; i<M; i++){
-		cin>>U>>V;
-		node[U].push_back(V);
-		node[V].push_back(U);
-	}
-	vector<vector<long long>> dp(K+1, vector<long long>(N+1));
-	dp.at(0).at(1) = 1;
-	for (int i=1; i<=K; i++){
-		long long total = 0;
-		for (int j=1; j<=N; j++) total += dp.at(i-1).at(j);
-		for (int j=1; j<=N; j++){
-			dp.at(i).at(j) = total - dp.at(i-1).at(j);
-			for (auto k: node[j]){
-				dp.at(i).at(j) -= dp.at(i-1).at(k);
-			}
-			dp.at(i).at(j) %= E;
-		}
-	}
- 	cout << dp.at(K).at(1) << endl;
+    int H,W;
+    long long A,C;
+    cin>>H>>W>>C;
+    vector<vector<long long>> A1(H, vector<long long>(W));
+    vector<vector<long long>> A2(H, vector<long long>(W));
+    for (int i=0; i<H; i++){
+        for (int j=0; j<W; j++){
+            cin>>A;
+            A1.at(i).at(j) = A;
+            A2.at(i).at(W-j-1) = A;
+        }
+    }
+    vector<vector<long long>> dp1(H, vector<long long>(W));
+    for (int i=0; i<H; i++){
+        for (int j=0; j<W; j++){
+            if (i==0){
+                if (j==0) dp1.at(i).at(j) = A1.at(i).at(j);
+                else dp1.at(i).at(j) = min(A1.at(i).at(j), dp1.at(i).at(j-1)+C);
+            }else if (j==0) dp1.at(i).at(j) = min(A1.at(i).at(j), dp1.at(i-1).at(j)+C);
+            else dp1.at(i).at(j) = min(min(A1.at(i).at(j), dp1.at(i-1).at(j)+C), dp1.at(i).at(j-1)+C);
+        }
+    }
+    long long ans = LLONG_MAX;
+    for (int i=0; i<H; i++){
+        for (int j=0; j<W; j++){
+            long long cur;
+            if (i==0){
+                if (j==0)continue;
+                else cur = dp1.at(i).at(j-1) + A1.at(i).at(j);
+            }else if (j==0)cur = dp1.at(i-1).at(j) + A1.at(i).at(j);
+            else cur = min(dp1.at(i-1).at(j), dp1.at(i).at(j-1))+A1.at(i).at(j);
+            ans = min(ans, cur+C);
+        }
+    }
+    //第二弾
+    vector<vector<long long>> dp2(H, vector<long long>(W));
+    for (int i=0; i<H; i++){
+        for (int j=0; j<W; j++){
+            if (i==0){
+                if (j==0) dp2.at(i).at(j) = A2.at(i).at(j);
+                else dp2.at(i).at(j) = min(A2.at(i).at(j), dp2.at(i).at(j-1)+C);
+            }else if (j==0) dp2.at(i).at(j) = min(A2.at(i).at(j), dp2.at(i-1).at(j)+C);
+            else dp2.at(i).at(j) = min(min(A2.at(i).at(j), dp2.at(i-1).at(j)+C), dp2.at(i).at(j-1)+C);
+        }
+    }
+    for (int i=0; i<H; i++){
+        for (int j=0; j<W; j++){
+            long long cur;
+            if (i==0){
+                if (j==0)continue;
+                else cur = dp2.at(i).at(j-1) + A2.at(i).at(j);
+            }else if (j==0)cur = dp2.at(i-1).at(j) + A2.at(i).at(j);
+            else cur = min(dp2.at(i-1).at(j), dp2.at(i).at(j-1))+A2.at(i).at(j);
+            ans = min(ans, cur+C);
+        }
+    }
+    cout << ans << endl;
 }
