@@ -1,52 +1,46 @@
-#include <iostream>
 #include <vector>
-#include <algorithm>
+#include <iostream>
+#include <string>
 using namespace std;
-class UnionFind {
-public:
-	vector<int> par;
-	vector<int> group;
-
-	void init(int sz) {
-		par.resize(sz, -1);
-		group.resize(sz, 1);
-	}
-	int root(int pos) {
-		if (par[pos] == -1) return pos;
-		par[pos] = root(par[pos]);
-		return par[pos];
-	}
-	void unite(int u, int v) {
-		u = root(u); v = root(v);
-		if (u == v) return;
-		par[u] = v;
-		group[v] = group[u]+group[v];
-		// cout<<"group " << v << " "<< group[v]<<endl;
-	}
-	bool same(int u, int v) {
-		if (root(u) == root(v)) return true;
-		return false;
-	}
-	int group_size(int u) {
-		// cout << "u " << u  << " " << root(u) << " " << group[root(u)]<< endl;
-		return group[root(u)];
-	}
-};
-
 int main(){
-	int N;
-	cin>>N;
-	vector<vector<int>> node(N-1, vector<int>(3));
-	UnionFind UF;
-	UF.init(N+1);
-	for (auto &n: node) cin>>n.at(0)>>n.at(1)>>n.at(2);
-	sort(node.begin(),node.end(),[](const vector<int> &x,const vector<int> &y){return x[2] < y[2];});
-	long long ans = 0;
-	for (auto &n: node){
-		if (UF.same(n.at(0), n.at(1))==false) {
-			ans += 1LL*UF.group_size(n.at(0))*UF.group_size(n.at(1))*n.at(2);
-			// cout << UF.group_size(n.at(0)) << " " << UF.group_size(n.at(1)) << endl;
-			UF.unite(n.at(0),n.at(1));
+	int N;string S;cin>>N>>S;
+	int E = 998244353;
+	vector<vector<vector<int>>> dp(N+1, vector<vector<int>>(1024, vector<int>(10))); //i回目, パターン, 前回の参加
+
+	//bitDP
+	for (int i=1; i<=N; i++){ //i回目のコンテスト参加時点
+		//まず前回のコンテストのコピー
+		for (int j=0; j<1024; j++){
+			for (int k=0; k<10; k++){
+				dp.at(i).at(j).at(k) = dp.at(i-1).at(j).at(k);
+				/*前回の参加と今回のコンテストが一致したら2倍する
+				B未
+				BB 　　みたいに倍になるから*/
+				if (k==S[i-1]-'A') {
+					dp.at(i).at(j).at(k) += dp.at(i-1).at(j).at(k);
+					dp.at(i).at(j).at(k) %= E;
+				}
+			}
+		}
+		int c = S[i-1]-'A';
+		//今回のコンテストに、今まで参加していなかったら、その分を加算
+		for (int j=0; j<1024; j++){
+			if ((1&(j>>c))==0){
+				for (int k=0; k<10; k++){
+					dp.at(i).at(j+(1<<c)).at(c) += dp.at(i).at(j).at(k);
+					dp.at(i).at(j+(1<<c)).at(c) %= E;
+				}
+			}
+		}
+		//今回初参加
+		dp.at(i).at(1<<c).at(c)++;
+		dp.at(i).at(1<<c).at(c) %= E;
+	}
+	int ans = 0;
+	for (int i=0; i<1024; i++){
+		for (int j=0; j<10; j++){
+			ans += dp.at(N).at(i).at(j);
+			ans %= E;
 		}
 	}
 	cout<<ans<<endl;
