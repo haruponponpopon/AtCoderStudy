@@ -1,42 +1,35 @@
 #include <iostream>
+#include <vector>
 #include <queue>
 #include <climits>
 using namespace std;
-struct node{
-	int go;
-	int k;
-	int time;
-};
 int main(){
-	int N,M,X,Y,A,B,T,K;cin>>N>>M>>X>>Y;
-	vector<vector<node>> graph(N+1);
+	int N,M,A,B,C;cin>>N>>M;
+	vector<vector<pair<int, int>>>graph(N+1);
 	for (int i=0; i<M; i++){
-		cin>>A>>B>>T>>K;
-		graph[A].push_back({B,K,T});
-		graph[B].push_back({A,K,T});
+		cin>>A>>B>>C;
+		graph[A].push_back({B,C});//ノード,距離
 	}
-	priority_queue<pair<long long, int>,vector<pair<long long, int>>,greater<>> que;
-	vector<bool>used(N+1, false);
-	vector<long long>time(N+1,LLONG_MAX);
-	que.push({0,X});
-	time.at(X) = 0;
-	while (!que.empty()){
-		auto current = que.top();que.pop();
-		if (time[current.second]<current.first) continue;
-		// cout<<current.second<<endl;
-		used[current.second]=true;
-		for (auto next: graph[current.second]){
-			if (used[next.go])continue;
-			long long arrive = current.first;
-			if (arrive%next.k!=0)arrive = (arrive/next.k+1)*next.k;
-			arrive += next.time;
-			// cout<<next.go<<" "<<arrive<<endl;
-			if (arrive<time[next.go]){
-				time[next.go] = arrive;
-				que.push({arrive, next.go});
+	for (int start=1; start<=N; start++){
+		// cout<<start<<endl;
+		priority_queue<pair<int, int>,vector<pair<int, int>>,greater<>> que;//距離、ノード
+		que.push({0,start});
+		vector<int> min_dis(N+1, INT_MAX);
+		int ans = INT_MAX;
+		while (!que.empty()){
+			auto current = que.top(); que.pop();//距離,ノード
+			if (min_dis.at(current.second)<current.first)continue;
+			for (auto next: graph[current.second]){//ノード、距離
+				if (next.first ==start)ans = min(ans, current.first+next.second);
+				else{
+					if (min_dis.at(next.first)>current.first+next.second){
+						min_dis.at(next.first) = current.first+next.second;
+						que.push({current.first+next.second,next.first});
+					}
+				}
 			}
 		}
+		if (ans==INT_MAX)cout<<-1<<endl;
+		else cout<<ans<<endl;
 	}
-	if (time[Y]==LLONG_MAX)cout<<-1<<endl;
-	else cout<<time[Y]<<endl;
 }
